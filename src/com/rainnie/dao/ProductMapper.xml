@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+     "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.rainnie.dao.ProductMapper">
+	<select id="queryProducts" resultType="com.rainnie.po.Product">
+		 select * from product
+	</select>
+	<!-- <select id="queryProducts" resultMap="ProductWithCategory">
+		select p.*,GROUP_CONCAT(c.cname SEPARATOR ',') 
+		from product p,category c,product_category pc
+		where pc.pid=p.id
+		and pc.cid=c.cid GROUP BY p.id
+	</select>
+	<resultMap type="com.rainnie.po.Product" id="ProductWithCategory">
+		<id property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="price" column="price"/>
+		<result property="createtime" column="createtime"/>
+		<result property="detail" column="detail"/>
+		<collection property="categories" ofType="com.rainnie.po.Category">
+			<id property="cid" column="cid"/>
+			<result property="cname" column="cname"/>
+		</collection>
+	</resultMap> -->
+	
+	<insert id="insertProduct" parameterType="com.rainnie.po.Product" useGeneratedKeys="true" keyProperty="id">
+		insert into product(name,price,createtime,detail) values(#{name},#{price},#{createtime},#{detail})
+	</insert>
+	
+	<delete id="deleteProduct" parameterType="Integer">
+		delete from product where id=#{id}
+	</delete>
+	
+	<select id="queryProductById" parameterType="Integer" resultType="com.rainnie.po.Product">
+		select * from product where id=#{id}
+	</select>
+	
+	<update id="updateProduct" parameterType="com.rainnie.po.Product">
+		update product set name=#{name},price=#{price},createtime=#{createtime},detail=#{detail} where id=#{id}
+	</update>
+	
+	
+	<select id="queryCategories" resultType="com.rainnie.po.Category">
+		select * from category where cid in
+		<foreach collection="ids" item="id" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+	<select id="queryAllCategory" resultType="com.rainnie.po.Category">
+		select * from category
+	</select>
+	
+	<select id="queryCategoriesByPid" resultType="com.rainnie.po.Category">
+		select c.* from product_category pc,category c
+		where pc.pid=#{pid} and pc.cid=c.cid
+	</select>
+	
+	<insert id="insertProductCategory">
+		insert into product_category(pid,cid) values
+		<foreach collection="cids" item="cid" separator=",">
+			(#{pid},#{cid})
+		</foreach>
+	</insert>
+	
+	<delete id="deleteProductCategoryByPid">
+		delete from product_category where pid=#{pid}
+	</delete>
+	
+	 
+	
+</mapper>
